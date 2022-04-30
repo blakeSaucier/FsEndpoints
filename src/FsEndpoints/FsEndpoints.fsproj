@@ -8,7 +8,7 @@
     <Compile Include="Endpoint.fs" />
     <Compile Include="ExtendedTypes.fs" />
     <Compile Include="OpenApi.fs" />
-    <Compile Include="Middleware.fs" />    
+    <Compile Include="ExtensionMethods.fs" />    
   </ItemGroup>
 
   <ItemGroup>

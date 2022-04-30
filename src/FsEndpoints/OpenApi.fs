@@ -302,7 +302,7 @@ module Generate =
     apiDocument {
       info (apiInfo {
         version "1.0.0"
-        title "TBD"
+        title (Assembly.GetEntryAssembly().GetName().Name)
       })
       paths p
     }
