@@ -5,12 +5,14 @@ open Microsoft.AspNetCore.Http
 open FsEndpoints
 open Giraffe.Core
 
-type Person = { Id: int
-                Name: string
-                MiddleName: string }
+type Person =
+    { Id: int
+      Name: string
+      MiddleName: string }
 
-type Book = { Title: string
-              AuthorId: int }
+type Book =
+    { Title: string
+      AuthorId: int }
 
 type Employee =
     { First: string
@@ -25,30 +27,41 @@ type Company =
       Budget: Decimal
       YearEnd: DateOnly
       Employees: Employee list }
-    
-let james =
-    { Id = 123
-      Name = "James"
-      MiddleName = "Blake" }
-
-let endpoint2 : FsEndpointDef =
-    { Name = "Person"
-      Path = "/person"
-      Meta = Some { OperationName = "GetPerson"; Produces = ApplicationJson; Response = Some typeof<Person>; Request = None }
-      Verb = Endpoint.GET
-      Handler = (json { Id = 1; Name = "James"; MiddleName = "Blake" }) }    
 
 open Giraffe
 
 let personHandler : HttpHandler =
     fun (next: HttpFunc) (ctx: HttpContext) ->        
         let id =  ctx.Request.RouteValues["id"].ToString() |> int
-        json { james with Id = id } next ctx
+        json { Id = id; Name = "James"; MiddleName = "" } next ctx
+
+let a = returns<Person>
         
 let api = [
-    Endpoint.get<Person>("/person/{id:int}", personHandler)
-    Endpoint.post<Company, unit>("/companies", json ())
-    Endpoint.post<Book, Person[]>("/person/{personId:int}/book", json { Name = "James"; MiddleName = "Test"; Id = 1234 })
+    endpoint {
+        GET "/person/{id:int}"
+        schema
+            { Request = None
+              Responses = [
+                  { Content = ApplicationJson
+                    Status = System.Net.HttpStatusCode.OK
+                    Response = Some typeof<Person> }
+                  { Content = ApplicationJson
+                    Status = System.Net.HttpStatusCode.NotFound
+                    Response = Some typeof<unit> }
+              ] }
+        handler personHandler
+    }
+    
+    endpoint {
+        POST "/companies"
+        handler (json ())
+    }
+    
+    endpoint {
+        POST "/person/{personId:int}/book"
+        handler (json { Id = 123; Name = "James"; MiddleName = "" })
+    }
 ]
 
 let builder = WebApplication.CreateBuilder()

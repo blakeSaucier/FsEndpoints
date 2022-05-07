@@ -242,20 +242,26 @@ module Generate =
       }
       
     let generateRequestContent (endpoint: FsEndpointDef) =
-      match endpoint.Meta with
+      match endpoint.Schema with
       | Some c ->
         match c.Request with
-        | Some r -> [ generateSchema r ]
+        | Some r -> [ generateSchema r.Request ]
         | _ -> [] 
       | _ -> []
-          
-    let generateReturnContent (endpoint: FsEndpointDef) =
-      match endpoint.Meta with
-      | Some c ->
-        match c.Response with
-        | Some r -> [ generateSchema r ]
-        | _ -> []
-      | _ -> []
+
+      
+    let generateResponses (endpoint: FsEndpointDef) =
+      match endpoint.Schema with
+      | None -> []
+      | Some schema ->
+        schema.Responses |> List.map (fun r ->
+          let responseContent =
+            match r.Response with
+            | None -> []
+            | Some res -> [ generateSchema res ]
+          r.Status, apiResponse {
+              content responseContent
+          })
       
     let generatePathParameters (parameters: RoutePatternParameterPart seq) =
       parameters
@@ -288,11 +294,9 @@ module Generate =
             requestBody (apiRequestBody {
               content (generateRequestContent endpoint)
             })
+            
             description endpoint.Name
-            responses [HttpStatusCode.OK, apiResponse {
-              description "Success"
-              content (generateReturnContent endpoint)
-            }]
+            responses (generateResponses endpoint)
           }
         ]
     }
