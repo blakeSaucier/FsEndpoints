@@ -25,9 +25,9 @@ This framework allows us to describe web endpoints as *Data*.
 By taking this approach we get some interesting benefits, one of which is the ability to generate *documentation*.
 
 ## Features
-- [x] Describe an HTTP endpoint with idiomatic F#
-- [x] Built on top of Asp Net Core
-- [x] Automatic Open Api/Swagger generation
+- ✅ Describe an HTTP endpoint with idiomatic F#
+- ✅ Built on top of Asp Net Core
+- ✅ Automatic Open Api/Swagger generation
 
 ## Roadmap
 - Automatic serialization/deserialization
